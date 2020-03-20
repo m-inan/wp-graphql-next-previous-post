@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/m-inan/wp-graphql-next-previous-post
  * Description: Adds post type for next and previous post field
  * Author: Minan
- * Version: 0.0.1
+ * Version: 0.1.0
  *
  */
 
