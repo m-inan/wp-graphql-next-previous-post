@@ -6,7 +6,10 @@ When using `wp-graphql`, you can use this package to bring the next and previous
 
 ```sh
 cd wp-content/plugins
+
 git clone --branch master https://github.com/m-inan/wp-graphql-next-previous-post.git
+
+composer dump-autoload -o
 ```
 
 ### Usage
