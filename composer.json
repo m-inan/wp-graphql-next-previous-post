@@ -1,0 +1,16 @@
+{
+    "name": "m-inan/wp-graphql-next-previous-post",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "Muhammet INAN",
+            "email": "muhammet@tilpark.com",
+            "role": "developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "WPGraphQL\\Extensions\\NextPreviousPost\\": "src/"
+        }
+    }
+}
