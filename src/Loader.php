@@ -36,27 +36,45 @@ class Loader
     public function npp_action_register_types()
     {
         register_graphql_field('Post', 'next', [
-            'type' => 'post',
+            'type' => 'Post',
             'description' => __(
-                'Get Next Post',
-                'wp-graphql-offset-pagination'
+                'Next post'
             ),
             'resolve' => function (Post $post, array $args, AppContext $context) {
+                global $post;
+
+                // get post
+                $post = get_post($post->ID, OBJECT);
+
+                // setup global $post variable
+                setup_postdata($post);
+
                 $next = get_next_post();
+
+                wp_reset_postdata();
 
                 return DataSource::resolve_post_object($next->ID, $context);
             },
         ]);
 
         register_graphql_field('Post', 'previous', [
-            'type' => 'post',
+            'type' => 'Post',
             'description' => __(
-                'Get Previous Post',
-                'wp-graphql-offset-pagination'
+                'Previous post'
             ),
 
             'resolve' => function (Post $post, array $args, AppContext $context) {
+                global $post;
+
+                // get post
+                $post = get_post($post->ID, OBJECT);
+
+                // setup global $post variable
+                setup_postdata($post);
+
                 $prev = get_previous_post();
+
+                wp_reset_postdata();
 
                 return DataSource::resolve_post_object($prev->ID, $context);
             },
