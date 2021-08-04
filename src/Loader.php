@@ -7,7 +7,7 @@ use WPGraphQL\Data\DataSource;
 use WPGraphQL\Model\Post;
 
 /**
- * Class Laoder
+ * Class Loader
  *
  * This class allows you to see the next and previous posts in the 'post' type.
  *
@@ -53,6 +53,10 @@ class Loader
 
                 wp_reset_postdata();
 
+                if (!$next) {
+                    return null;
+                }
+
                 return DataSource::resolve_post_object($next->ID, $context);
             },
         ]);
@@ -75,6 +79,10 @@ class Loader
                 $prev = get_previous_post();
 
                 wp_reset_postdata();
+
+                if (!$prev) {
+                    return null;
+                }
 
                 return DataSource::resolve_post_object($prev->ID, $context);
             },
