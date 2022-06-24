@@ -3,7 +3,6 @@
 namespace WPGraphQL\Extensions\NextPreviousPost;
 
 use WPGraphQL\AppContext;
-use WPGraphQL\Data\DataSource;
 use WPGraphQL\Model\Post;
 
 /**
@@ -30,62 +29,85 @@ class Loader
             9,
             0
         );
-
     }
 
     public function npp_action_register_types()
     {
-        register_graphql_field('Post', 'next', [
-            'type' => 'Post',
-            'description' => __(
-                'Next post'
-            ),
-            'resolve' => function (Post $post, array $args, AppContext $context) {
-                global $post;
+        $postTypes = get_post_types(
+            ['public' => true, '_builtin' => false],
+            'objects'
+        );
+        $typeNames = array_filter(
+            array_map(function ($postType) {
+                return isset($postType->graphql_single_name)
+                    ? ucfirst($postType->graphql_single_name)
+                    : null;
+            }, $postTypes)
+        );
 
-                // get post
-                $post = get_post($post->ID, OBJECT);
+        $typeNames[] = 'Post';
 
-                // setup global $post variable
-                setup_postdata($post);
+        foreach ($typeNames as $typeName) {
+            register_graphql_field($typeName, 'next', [
+                'type' => $typeName,
+                'description' => __('Next post'),
+                'resolve' => function (
+                    Post $post,
+                    array $args,
+                    AppContext $context
+                ) {
+                    global $post;
 
-                $next = get_next_post();
+                    // get post
+                    $post = get_post($post->ID, OBJECT);
 
-                wp_reset_postdata();
+                    // setup global $post variable
+                    setup_postdata($post);
 
-                if (!$next) {
-                    return null;
-                }
+                    $next = get_next_post();
 
-                return DataSource::resolve_post_object($next->ID, $context);
-            },
-        ]);
+                    wp_reset_postdata();
 
-        register_graphql_field('Post', 'previous', [
-            'type' => 'Post',
-            'description' => __(
-                'Previous post'
-            ),
+                    if (!$next) {
+                        return null;
+                    }
 
-            'resolve' => function (Post $post, array $args, AppContext $context) {
-                global $post;
+                    return $context
+                        ->get_loader('post')
+                        ->load_deferred($next->ID);
+                },
+            ]);
 
-                // get post
-                $post = get_post($post->ID, OBJECT);
+            register_graphql_field($typeName, 'previous', [
+                'type' => $typeName,
+                'description' => __('Previous post'),
 
-                // setup global $post variable
-                setup_postdata($post);
+                'resolve' => function (
+                    Post $post,
+                    array $args,
+                    AppContext $context
+                ) {
+                    global $post;
 
-                $prev = get_previous_post();
+                    // get post
+                    $post = get_post($post->ID, OBJECT);
 
-                wp_reset_postdata();
+                    // setup global $post variable
+                    setup_postdata($post);
 
-                if (!$prev) {
-                    return null;
-                }
+                    $prev = get_previous_post();
 
-                return DataSource::resolve_post_object($prev->ID, $context);
-            },
-        ]);
+                    wp_reset_postdata();
+
+                    if (!$prev) {
+                        return null;
+                    }
+
+                    return $context
+                        ->get_loader('post')
+                        ->load_deferred($prev->ID);
+                },
+            ]);
+        }
     }
 }
