@@ -45,7 +45,9 @@ class Loader
             }, $postTypes)
         );
 
-        foreach (['Post', ...$typeNames] as $typeName) {
+        $typeNames[] = 'Post';
+
+        foreach ($typeNames as $typeName) {
             register_graphql_field($typeName, 'next', [
                 'type' => $typeName,
                 'description' => __('Next post'),
@@ -109,4 +111,3 @@ class Loader
         }
     }
 }
-
