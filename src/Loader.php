@@ -35,57 +35,56 @@ class Loader
 
     public function npp_action_register_types()
     {
-        register_graphql_field('Post', 'next', [
-            'type' => 'Post',
-            'description' => __(
-                'Next post'
-            ),
-            'resolve' => function (Post $post, array $args, AppContext $context) {
-                global $post;
+        $post_types = get_post_types(['public' => true], 'names');
 
-                // get post
-                $post = get_post($post->ID, OBJECT);
+        foreach ($post_types as $post_type) {
+            register_graphql_field($post_type, 'next', [
+                'type' => $post_type,
+                'description' => __('Next post'),
+                'resolve' => function (Post $post, array $args, AppContext $context) {
+                    global $post;
 
-                // setup global $post variable
-                setup_postdata($post);
+                    // get post
+                    $post = get_post($post->ID, OBJECT);
 
-                $next = get_next_post();
+                    // setup global $post variable
+                    setup_postdata($post);
 
-                wp_reset_postdata();
+                    $next = get_next_post();
 
-                if (!$next) {
-                    return null;
-                }
+                    wp_reset_postdata();
 
-                return DataSource::resolve_post_object($next->ID, $context);
-            },
-        ]);
+                    if (!$next) {
+                        return null;
+                    }
 
-        register_graphql_field('Post', 'previous', [
-            'type' => 'Post',
-            'description' => __(
-                'Previous post'
-            ),
+                    return DataSource::resolve_post_object($next->ID, $context);
+                },
+            ]);
 
-            'resolve' => function (Post $post, array $args, AppContext $context) {
-                global $post;
+            register_graphql_field($post_type, 'previous', [
+                'type' => $post_type,
+                'description' => __('Previous post'),
+                'resolve' => function (Post $post, array $args, AppContext $context) {
+                    global $post;
 
-                // get post
-                $post = get_post($post->ID, OBJECT);
+                    // get post
+                    $post = get_post($post->ID, OBJECT);
 
-                // setup global $post variable
-                setup_postdata($post);
+                    // setup global $post variable
+                    setup_postdata($post);
 
-                $prev = get_previous_post();
+                    $prev = get_previous_post();
 
-                wp_reset_postdata();
+                    wp_reset_postdata();
 
-                if (!$prev) {
-                    return null;
-                }
+                    if (!$prev) {
+                        return null;
+                    }
 
-                return DataSource::resolve_post_object($prev->ID, $context);
-            },
-        ]);
+                    return DataSource::resolve_post_object($prev->ID, $context);
+                },
+            ]);
+        }
     }
 }
